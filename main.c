@@ -1,3 +1,23 @@
+//                                    Aplicativo PERT SOLVER
+/*
+                                        Integrantes do grupo
+                                          
+                                          Nome/Matrícula:
+
+                                1- Henrique Ribeiro da Silva 0011453
+                                2- João Geraldo Borges Sales 0049541
+                                3- Rafael Souza Bernardo 0041154
+                                4- Samuel de Castro Ribeiro 0032743
+                                5- Yuri Gandra Santos 00494666
+*/
+
+/*Para compilar o arquivo é necessário atribuir alguns parâmetros na seguinte ordem: ./pert-solver <arquivo>  d.dot futebol.r
+
+                            Ambiente de desenvolvimento: Visual Studio / Linux 
+                            Data: 07/12/2019
+
+*/
+
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <string.h> 
@@ -60,12 +80,12 @@ int main(int argc, char** argv) {
 
 
     } else {
-        // abri o arquivo 
+        // abre o arquivo 
         FILE *arquivoEntrada = fopen(argv[1], "r");
 
         while (fgets(linha, 100, arquivoEntrada) != NULL) {
 
-            /*igonara o comentário do do arquivo*/
+            /*ignora o comentário do arquivo*/
             if (linha[0] == ' ' || linha[0] == '#') {
 
 
@@ -115,7 +135,7 @@ int main(int argc, char** argv) {
                 c++;
 
 
-
+            // condição para pegar os  predecessores
             } else if (linha[0] == 'a') {
 
 
@@ -131,7 +151,7 @@ int main(int argc, char** argv) {
 
                 R[i][j] = 1;
 
-
+            //fim do arquivo
             } else if (linha[0] == 'f') {
 
 
@@ -311,22 +331,6 @@ int main(int argc, char** argv) {
         } //Fim do while
 
 
-        /*
-            for (i = 0; i < t; i++) {
-                for (j = 0; j < t; j++) {
-
-                    if (j == t - 1) {
-                        printf("\t%d\n", T[i][j]);
-                    } else {
-                        printf("\t%d ", T[i][j]);
-                    }
-
-                }
-
-
-            } 
-
-         */
 
         // Verifica qual é o predecessor do FIM
         if (verificaMatriz == 0) {
@@ -348,122 +352,281 @@ int main(int argc, char** argv) {
         gVetorAtividades[t - 1].termino = gVetorAtividades[t - 1].inicio;
 
 
-        /*
-        for(i = t -1; i > 0; i--) {
-
-            for(j = 0; j < t; j++) {
-
-                if(R[j][i] == 1) {
-
-                    if(gVetorAtividades[j].inicio == gVetorAtividades[i].termino) {
-
-                        gVetorAtividades[j].critico = 1;
-
-                    }
-
-                
-
-            }
 
 
-            }
-
-        }
-         
-
-        for (i = 0; i < t; i++) {
-
-            if (gVetorAtividades[i].critico == 1) {
-
-                printf("%d\n", gVetorAtividades[i].id);
-
-            }
-
-
-        }
-*/
-
-        float tempoFinal = gVetorAtividades[t-1].inicio, tempoInicio;
+        float tempoFinal = gVetorAtividades[t - 1].inicio, tempoInicio;
         float *pTempoFinal;
         int numeroCritico = t - 1;
         int *numero = &numeroCritico;
         pTempoFinal = &tempoFinal;
 
-    do {
+        do {
 
 
-        //Procurar os predecessores do critico atual
-        for (i = 0; i< t; i++) {
+            //Procurar os predecessores do critico atual
+            for (i = 0; i < t; i++) {
 
-            if (R[i][numeroCritico] == 1) {
+                
+                if (R[i][numeroCritico] == 1) {
 
-                if (gVetorAtividades[numeroCritico].inicio == gVetorAtividades[i].termino) {
-                    //printf("%d, ", gVetorAtividades[i].id);
-                    *numero = i;
-                    gVetorAtividades[i].critico = 1;
-                    tempoInicio = gVetorAtividades[i].termino;
+                    if (gVetorAtividades[numeroCritico].inicio == gVetorAtividades[i].termino) {
+                        *numero = i;
+                        gVetorAtividades[i].critico = 1;
+                        tempoInicio = gVetorAtividades[i].termino;
+                    }
+
+
                 }
 
+            }
+
+
+        } while (tempoInicio != 0);
+
+        float teste = 0;
+        for (size_t i = 0; i < t; i++) {
+
+            if (gVetorAtividades[i].critico == 1) {
+                
+                teste += gVetorAtividades[i].duracao;
+            }
+            
+
+        }
+
+        printf("Projeto: '%s'\n\n", argv[1]);
+        printf("Total de Atividades: %d\n\n", t);
+        printf("Makespan: %.2f\n\n", gVetorAtividades[t - 1].termino);
+        printf("Caminho Critico: \n\n");
+
+        for (i = 0; i < t; i++) {
+
+            if (gVetorAtividades[i].critico == 1) {
+
+                printf("%s", gVetorAtividades[i].nome);
+                printf("(%d)\t", gVetorAtividades[i].id);
+                printf("Duração: %.2f\t", gVetorAtividades[i].duracao);
+                printf("[%.2f....%.2f]\n\n", gVetorAtividades[i].inicio, gVetorAtividades[i].termino);
+
+            }
+
+
+        }
+
+        printf("Fim do Processamento.\n\n");
+        printf("Verificar os arquivos ‘%s’ e ‘%s’ para"
+                " detalhes sobre a rede de atividades e o Gantt Chart correspondente.\n\n", argv[2], argv[3]);
+
+
+        FILE *arquivoDot = fopen(argv[2], "w");
+        char *aux;
+
+        fprintf(arquivoDot, "digraph Pert\n");
+        fprintf(arquivoDot, "{\n");
+        fprintf(arquivoDot, "\trankdir=TB\n");
+
+        for (i = 0; i < t; i++) {
+
+            if (gVetorAtividades[i].critico == 1) {
+
+                aux = strtok(gVetorAtividades[i].nome, "\n");
+                strcpy(gVetorAtividades[i].nome, aux);
+                fprintf(arquivoDot, "\t%d [label=\"(%d) %s \", fontcolor=red, color=\"#ff0000\" ];\n", i, gVetorAtividades[i].id, gVetorAtividades[i].nome);
+
+            } else {
+
+                aux = strtok(gVetorAtividades[i].nome, "\n");
+                strcpy(gVetorAtividades[i].nome, aux);
+                fprintf(arquivoDot, "\t%d [label=\"(%d) %s\" ];\n", i, gVetorAtividades[i].id, gVetorAtividades[i].nome);
+
+            }
+
+        }
+
+        fprintf(arquivoDot, "\n");
+
+        for (i = 0; i < t; i++) {
+
+
+            for (j = 0; j < t; j++) {
+
+
+                /*if (R[i][j] == 1 ){
+                
+                    if (gVetorAtividades[j].critico == 1) {
+                        fprintf(arquivoDot, "\t%d -> %d [color=\"#ff0000\"];\n",i,j);    
+                    } else {
+                        fprintf(arquivoDot, "\t%d -> %d;\n", i, j);    
+                    }
+                
+                }*/
+
+
+                if (R[i][j] == 1) {
+
+                    if (gVetorAtividades[i].critico == 1 && gVetorAtividades[j].critico == 1) {
+
+                        fprintf(arquivoDot, "\t%d -> %d [color=\"#ff0000\"];\n", i, j);
+
+                    } else {
+
+                        fprintf(arquivoDot, "\t%d -> %d;\n", i, j);
+
+                    }
+
+
+
+                }
 
             }
 
         }
 
 
-    } while (tempoInicio != 0);
+        fprintf(arquivoDot, "}\n");
 
-    float teste = 0;
-    for (size_t i = 0; i < t; i++) {
-        
-        if (gVetorAtividades[i].critico == 1) {
-            //printf("%d, ", gVetorAtividades[i].id);
-            teste+= gVetorAtividades[i].duracao;
+        char *auxiliar;
+        int fflush(FILE * arquivoDot);
+
+        fclose(arquivoDot);
+
+
+        FILE *graficoGant = fopen(argv[3], "w");
+
+        auxiliar = strtok(argv[3], ".");
+
+        fprintf(graficoGant, "# Nome do arquivo de saida, informado pela aplicacao\n");
+        fprintf(graficoGant, "ArqSaida <- \"%s.png\"\n", auxiliar);        
+        fprintf(graficoGant, "#\n");
+        fprintf(graficoGant, "# Parametros que devem ser informados pelo pert-solver\n");
+        fprintf(graficoGant, "#\n\n");
+        fprintf(graficoGant, "# Numero de atividades e makespan calculado\n\n");
+        fprintf(graficoGant, "Makespan <- %.2f\n", gVetorAtividades[t - 1].termino);
+        fprintf(graficoGant, "Atividades <- %d\n", t);
+        fprintf(graficoGant, "# Vetor com as flags das atividades criticas\n\n");
+        fprintf(graficoGant, "Cp <- c(");
+        for (size_t i = 0; i < t; i++) {
+
+            if (i < t - 1) {
+
+                if (gVetorAtividades[i].critico == 1) {
+                    fprintf(graficoGant, "T,");
+                } else {
+                    fprintf(graficoGant, "F,");
+                }
+
+            } else {
+
+                if (gVetorAtividades[i].critico == 1) {
+                    fprintf(graficoGant, "T)\n");
+                } else {
+                    fprintf(graficoGant, "F)\n");
+                }
+            }
+
+            
         }
-           // printf("Termino %f\n", gVetorAtividades[i].termino);
         
-    }
-            //printf("Valor total %f\n", teste);
-    
+        fprintf(graficoGant,"#Vetor com os indices das atividades\n");
+        fprintf(graficoGant, "K <- c(");
+        for (i = 0; i < t; i++) {
 
-    }
+            if (i < t - 1) {
+                
+                fprintf(graficoGant, "%d,", gVetorAtividades[i].id);
+                
+            } else {
+
+                fprintf(graficoGant, "%d)\n", gVetorAtividades[i].id);
+            }
+
+            
+        }
+                                
+        fprintf(graficoGant,"#Vetor com os tempos de inicio das atividades\n");
+        fprintf(graficoGant, "Sk <- c(");
+        for (size_t i = 0; i < t; i++) {
+
+            if (i < t - 1) {
+
+                    fprintf(graficoGant, "%.2f,", gVetorAtividades[i].inicio);
+
+            } else {
+
+               fprintf(graficoGant, "Makespan)\n");
+               
+            }
+
+            
+        }    
 
 
-    printf("Projeto: '%s'\n\n", argv[1]);
-    printf("Total de Atividades: %d\n\n", t);
-    printf("Makespan: %.2f\n\n", gVetorAtividades[t-1].termino);
-    printf("Caminho Critico: \n\n");
+        fprintf(graficoGant,"#Vetor com os tempos de termino das atividades\n");
+        fprintf(graficoGant, "Tk <- c(");
+        for (size_t i = 0; i < t; i++) {
 
-    for(i = 0; i < t; i++) {
+            if (i < t - 1) {
 
-        if(gVetorAtividades[i].critico == 1) {
+                fprintf(graficoGant, "%.2f,", gVetorAtividades[i].termino);
 
-            printf("%s", gVetorAtividades[i].nome);
-            printf("(%d)\t", gVetorAtividades[i].id);
-            printf("Duração: %.2f\t", gVetorAtividades[i].duracao);
-            printf("[%.2f....%.2f]\n\n", gVetorAtividades[i].inicio, gVetorAtividades[i].termino);
+            } else {
 
+               fprintf(graficoGant, "Makespan)\n");
+               
+            }
+
+            
         }
         
+        fprintf(graficoGant,"#\n");
+        fprintf(graficoGant,"# Fim dos parametros. Daqui pra frente deve ser automatico.\n");
+        fprintf(graficoGant,"#\n\n");
+        fprintf(graficoGant,"# Calculos auxiliares\n");
+        fprintf(graficoGant,"xMin <- 0\n");
+        fprintf(graficoGant,"xMax <- Makespan + 1\n");
+        fprintf(graficoGant,"yMin <- 0\n");
+        fprintf(graficoGant,"yMax <- Atividades + 1\n");
+        fprintf(graficoGant,"# Geracao de arquivo\n");
+        fprintf(graficoGant,"png(ArqSaida, width=1200)\n");
+        fprintf(graficoGant,"# Cria o plot\n");
+        fprintf(graficoGant,"titulo <- \"Gráfico de Gantt\"\n");
+        fprintf(graficoGant,"plot(c(xMin, xMax), c(yMin, yMax), type=\"n\",\n");
+        fprintf(graficoGant,"\tmain=titulo, xlab=\"Tempo\", ylab=\"Atividades\");\n");
+        fprintf(graficoGant,"# Desenha um retangulo para cada atividade\n");
+        fprintf(graficoGant,"for(indice in 1:length(K))\n");
+        fprintf(graficoGant,"{\n");
+        fprintf(graficoGant,"\t# Busca as coordenadas dos pontos do retangulo\n");
+        fprintf(graficoGant,"\tPx1 <- Sk[indice]\n");
+        fprintf(graficoGant,"\tPy1 <- K[indice]\n");
+        fprintf(graficoGant,"\tPx2 <- Tk[indice]\n");
+        fprintf(graficoGant,"\tPy2 <- K[indice]\n");
+        fprintf(graficoGant,"\tPx3 <- Tk[indice]\n");
+        fprintf(graficoGant,"\tPy3 <- K[indice]+1\n");
+        fprintf(graficoGant,"\tPx4 <- Sk[indice]\n");
+        fprintf(graficoGant,"\tPy4 <- K[indice]+1\n\n");
+        fprintf(graficoGant,"\t# Define a cor de acordo com a flag de criticidade\n");
+        fprintf(graficoGant,"\tif(Cp[indice] == T)\n");
+        fprintf(graficoGant,"\t{\n");
+        fprintf(graficoGant,"\tcor <- \"red\"\n");
+        fprintf(graficoGant,"\tcortexto <- \"white\"\n");
+        fprintf(graficoGant,"\t}\n");
+        fprintf(graficoGant,"\telse\n");
+        fprintf(graficoGant,"\t{\n");
+        fprintf(graficoGant,"\tcor <- \"yellow\"\n");
+        fprintf(graficoGant,"\tcortexto <- \"black\"\n");
+        fprintf(graficoGant,"\t}\n\n");
+        fprintf(graficoGant,"\t# Desenha o polígono, fechando as coordenadas\n");
+        fprintf(graficoGant,"\tpolygon(c(Px1, Px2, Px3, Px4, Px1),\n");
+        fprintf(graficoGant,"\t\tc(Py1, Py2, Py3, Py4, Py1), col=cor)\n\n");
+        fprintf(graficoGant,"\ttext((Px1 + Px2)/2, (Py1 + Py3)/2, K[indice], col=cortexto)\n");
+        fprintf(graficoGant,"}\n");
+        fprintf(graficoGant,"dev.off()\n");
+
+
+        int fflush(FILE *graficoGant);
+        fclose(graficoGant);
+        
 
     }
-
-    printf("Fim do Processamento.\n\n");
-    printf("Verificar os arquivos ‘%s’ e ‘%s’ para"
-    " detalhes sobre a rede de atividades e o Gantt Chart correspondente.\n\n", argv[2], argv[3]);
-
-
-    FILE *arquivoDot = fopen(argv[2], "w");
-
-    fprintf(arquivoDot, "Digraph Pert\n");
-    fprintf(arquivoDot, "{\n");
-    fprintf(arquivoDot, "rankdir=TB\n");
-    for(i = 0; i < t; i++) {
-
-
-
-    }
-
-
-
     return (EXIT_SUCCESS);
 }
