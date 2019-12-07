@@ -1,0 +1,32 @@
+# Premissas para um projeto
+
+# Total de atividades, incluindo INI e FIM
+T 9
+
+# listagem das atividades
+n 0 0 INI
+n 1 21 Projeto
+n 2 5 ConstrucaoPrototipo
+n 3 7 AvaliacaoEquipamento
+n 4 2 TestePrototipo
+n 5 5 RedacaoRelatorioEquipamento
+n 6 8 RedacaoRelatorioMetodos
+n 7 2 RedacaoRelatorioFinal
+n 8 0 FIM
+
+
+# Listagem das precedencias
+a 0 1
+a 1 2
+a 1 3
+a 2 4
+a 3 5
+a 4 5
+a 3 6
+a 4 6
+a 5 7
+a 6 7
+a 7 8
+
+# Fim de arquivo
+f

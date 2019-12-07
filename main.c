@@ -49,7 +49,9 @@ int main(int argc, char** argv) {
     int qtdPredecessores = 0; //    contador das posiçoes do vetor de precedencias
     int posicao_P = 0; //posição no vetor de predecessores
     int p; // contador de coluna
-
+    int contCritico = 0; //Contador para controlar o caminho critico
+    float termino = 0; //Controla o termino para achar o caminho critico
+    int controleCritico; //Guarda a posicao do caminho critico atual
 
     /*Bloqueando caso falte argumentos para rodar o programa*/
     if (argc < 4) {
@@ -79,7 +81,7 @@ int main(int argc, char** argv) {
 
                 t = atoi(token);
 
-                gVetorAtividades = malloc(t * sizeof (atividade));
+                gVetorAtividades = calloc(t, sizeof (atividade));
 
                 R = (int**) calloc(t, sizeof (int *));
                 for (i = 0; i < t; i++) {
@@ -160,7 +162,7 @@ int main(int argc, char** argv) {
             }
 
         }
-        
+
 
 
         /*Liberando todos os sucessores de INI*/
@@ -169,10 +171,22 @@ int main(int argc, char** argv) {
             T[0][i] = 0;
 
         }
+
+        for (size_t k = 0; k < t - 1; k++) {
+            gVetorAtividades[k].critico = 0;
+        }
+
         /*Colocando o tempo da atividade INI*/
         gVetorAtividades[0].flagMinimal = 1;
         gVetorAtividades[0].inicio = 0;
         gVetorAtividades[0].termino = 0;
+        gVetorAtividades[0].critico = 1;
+        /*Colocando o tempo da atividade FIM*/
+        gVetorAtividades[t - 1].inicio = 0;
+        gVetorAtividades[t - 1].termino = 0;
+        gVetorAtividades[t - 1].critico = 1;
+
+
 
 
         // repete o loop até T ficar totalmente zerado
@@ -206,7 +220,6 @@ int main(int argc, char** argv) {
                 /*Se entrar na condição é porque a atividade é um minimal e ainda não foi agendado*/
                 if (verificador == 0 && gVetorAtividades[i].flagMinimal != 1) {
 
-                    printf("%d é um minimal\n", i);
                     //Atribuindo i ao vetor porque essa é a atividade que está sendo analisada no momento
                     M[posicao_m] = i;
                     gVetorAtividades[i].flagMinimal = 1;
@@ -218,13 +231,16 @@ int main(int argc, char** argv) {
 
             }
 
-
+            contCritico = 0;
             /*Laço de repetição para realizar agendamento das atividades que são minimais no momento*/
             for (i = 0; i < posicao_m; i++) {
-                
+
+
+
+
                 // aloca espaço de memoria para o vetor de predecessores
                 P = malloc(1 * sizeof (int));
-               
+
                 //Iniciando a quantidade de predecessores
                 qtdPredecessores = 0;
                 posicao_P = 0;
@@ -235,7 +251,6 @@ int main(int argc, char** argv) {
                     // Encontra os predecessores, fixando a coluna em um dos minimais do vetor M
                     if (R[j][(M[i])] == 1) {
 
-                        printf("predecessor: %d tem o tempo de termino: %f\n", j, gVetorAtividades[j].termino);
                         //Passando j, que representa a linha, porque é o predecessor do minimal
                         P[qtdPredecessores] = j;
                         qtdPredecessores++;
@@ -243,12 +258,12 @@ int main(int argc, char** argv) {
 
                         // Encontra o termino das atividades
                         if (qtdPredecessores == 1) {
-                           
+
                             gVetorAtividades[M[i]].inicio = gVetorAtividades[P[posicao_P]].termino;
                             gVetorAtividades[M[i]].termino = gVetorAtividades[M[i]].inicio + gVetorAtividades[M[i]].duracao;
                             posicao_P++;
                             //Caso o proximo predecessor tenha o tempo de termino maior que o já atribuido no minimal, será trocado
-                        } else if (qtdPredecessores > 1) {                            
+                        } else if (qtdPredecessores > 1) {
                             if (gVetorAtividades[M[i]].inicio < gVetorAtividades[P[posicao_P]].termino) {
                                 gVetorAtividades[M[i]].inicio = gVetorAtividades[P[posicao_P]].termino;
                                 //printf("Inicio: %d", gVetorAtividades[M[i]].inicio);                                
@@ -259,6 +274,7 @@ int main(int argc, char** argv) {
                             }
 
                         }
+
 
                     }
 
@@ -271,11 +287,9 @@ int main(int argc, char** argv) {
                     T[M[i]][p] = 0;
 
                 }
-                
+
             }
 
-
-            // terminoDasAtividades(P, qtdPredecessores, t);
 
 
 
@@ -296,52 +310,139 @@ int main(int argc, char** argv) {
 
         } //Fim do while
 
+
+        /*
+            for (i = 0; i < t; i++) {
+                for (j = 0; j < t; j++) {
+
+                    if (j == t - 1) {
+                        printf("\t%d\n", T[i][j]);
+                    } else {
+                        printf("\t%d ", T[i][j]);
+                    }
+
+                }
+
+
+            } 
+
+         */
+
+        // Verifica qual é o predecessor do FIM
+        if (verificaMatriz == 0) {
+
             for (i = 0; i < t; i++) {
 
+                if (gVetorAtividades[t - 1].inicio < gVetorAtividades[i].termino) {
 
-        for (j = 0; j < t; j++) {
+                    gVetorAtividades[t - 1].inicio = gVetorAtividades[i].termino;
 
-            if (j == t - 1) {
-                printf("\t%d\n", T[i][j]);
-            } else {
-                printf("\t%d ", T[i][j]);
+                }
+
+
+            }
+
+
+        }
+        // o inicio do FIM é igual ao inicio dele mesmo
+        gVetorAtividades[t - 1].termino = gVetorAtividades[t - 1].inicio;
+
+
+        /*
+        for(i = t -1; i > 0; i--) {
+
+            for(j = 0; j < t; j++) {
+
+                if(R[j][i] == 1) {
+
+                    if(gVetorAtividades[j].inicio == gVetorAtividades[i].termino) {
+
+                        gVetorAtividades[j].critico = 1;
+
+                    }
+
+                
+
+            }
+
+
+            }
+
+        }
+         
+
+        for (i = 0; i < t; i++) {
+
+            if (gVetorAtividades[i].critico == 1) {
+
+                printf("%d\n", gVetorAtividades[i].id);
+
+            }
+
+
+        }
+*/
+
+        float tempoFinal = gVetorAtividades[t-1].inicio, tempoInicio;
+    float *pTempoFinal;
+    int numeroCritico = t - 1;
+    int *numero = &numeroCritico;
+    pTempoFinal = &tempoFinal;
+
+    do {
+
+
+        //Procurar os predecessores do critico atual
+        for (i = 0; i< t; i++) {
+
+            if (R[i][numeroCritico] == 1) {
+
+                if (gVetorAtividades[numeroCritico].inicio == gVetorAtividades[i].termino) {
+                    //printf("%d, ", gVetorAtividades[i].id);
+                    *numero = i;
+                    gVetorAtividades[i].critico = 1;
+                    tempoInicio = gVetorAtividades[i].termino;
+                }
+
+
             }
 
         }
 
 
-    }
-    if (verificaMatriz == 0)  {
-        gVetorAtividades[t-1].inicio = gVetorAtividades[t-2].termino;
-        gVetorAtividades[t-1].termino = gVetorAtividades[t-1].inicio;
-    }
-    
-    printf("Tempo de termino do FIM: %f", gVetorAtividades[13].inicio);
+    } while (tempoInicio != 0);
 
-    for (i = 0; i < t; i++) {
-
-        printf("Duracao:%f\n", gVetorAtividades[i].duracao);
-
-        printf("Termino:%f\n", gVetorAtividades[i].termino);
-
-        printf("Inicio:%f\n", gVetorAtividades[i].inicio);
-
-
-    }
-
-    }
-
-    /*
-        for (i = 0; i < posicao_m; i++) {
-
-            printf("%d\n", M[i]);
+    float teste = 0;
+    for (size_t i = 0; i < t; i++) {
+        
+        if (gVetorAtividades[i].critico == 1) {
+            printf("%d, ", gVetorAtividades[i].id);
+            teste+= gVetorAtividades[i].duracao;
 
         }
-     */
+        
+    }
+            printf("Valor total %f\n", teste);
+    
+
+    }
 
 
 
 
+    /*printf("CAMINHO CRÍTICO \n");
+
+    for (i = 0; i < t; i++) {
+        if (gVetorAtividades[i].critico == 1) {
+            printf("%d, ", gVetorAtividades[i].id);
+        }
+            
+    }*/
+
+    
+
+
+    printf("Termino de F %f\n", gVetorAtividades[t - 1].termino);
 
 
     return (EXIT_SUCCESS);

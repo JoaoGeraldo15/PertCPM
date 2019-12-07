@@ -1,0 +1,35 @@
+﻿# Atividades para o projeto de montar bicicleta
+
+# Total de atividades em minutos, incluindo INI eFIM
+T 11
+
+# Listagem das atividades
+n 0 0 INI
+n 1 20 ApertoDaEstrutura 
+n 2 10 ColocacaoDoGuidom 
+n 3 30 ColocacaoDoMecanismoDeMarchas 
+n 4 20 MontagemDosPneusNasRodas 
+n 5 10 ColocacaoDasRodasNaEstrutura 
+n 6 30 InstalacaoDoMecanismo 
+n 7 10 ColocacaoDosPedais 
+n 8 5 ColocacaoDoAssento
+n 9 5 AjusteDaAlturaDoAssento
+n 10 0 FIM
+
+# Listagem das precedencias
+a 0 1
+a 0 4
+a 1 2
+a 1 3
+a 1 5
+a 1 8
+a 2 6
+a 3 6
+a 4 5
+a 5 6
+a 6 7
+a 7 9
+a 8 9 
+a 9 10
+# Fim do arquivo
+f

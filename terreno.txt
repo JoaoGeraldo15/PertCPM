@@ -1,0 +1,37 @@
+#
+# Exemplo de projeto simples de montagem de cadeira
+#
+# Total de atividades, incluindo INI e FIM
+T 11
+
+#
+# Listagem das atividades
+n 0 0.0 INI
+n 1 4 limpezaDoTerreno
+n 2 3 producaoEColocacaoDaFundacao
+n 3 7 producaoDaEstrutura
+n 4 6 colocacaoDoTelhado
+n 5 4 colocacaoDasTabuas
+n 6 6 instalacaoDoEncanamentoEFios
+n 7 5 colocarJanelasEPortas
+n 8 5 instalarParedeInterna
+n 9 5 pinturaDasParedes
+n 10 0 FIM
+
+# Listagem das precedencias
+a 0 1
+a 1 2
+a 2 3
+a 3 7
+a 3 4
+a 3 5
+a 4 6
+a 5 6
+a 6 8
+a 7 9
+a 8 9
+a 9 10
+
+
+# Fim de arquivo
+f
