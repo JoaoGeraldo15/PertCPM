@@ -384,10 +384,10 @@ int main(int argc, char** argv) {
 */
 
         float tempoFinal = gVetorAtividades[t-1].inicio, tempoInicio;
-    float *pTempoFinal;
-    int numeroCritico = t - 1;
-    int *numero = &numeroCritico;
-    pTempoFinal = &tempoFinal;
+        float *pTempoFinal;
+        int numeroCritico = t - 1;
+        int *numero = &numeroCritico;
+        pTempoFinal = &tempoFinal;
 
     do {
 
@@ -416,51 +416,54 @@ int main(int argc, char** argv) {
     for (size_t i = 0; i < t; i++) {
         
         if (gVetorAtividades[i].critico == 1) {
-            printf("%d, ", gVetorAtividades[i].id);
+            //printf("%d, ", gVetorAtividades[i].id);
             teste+= gVetorAtividades[i].duracao;
+        }
+           // printf("Termino %f\n", gVetorAtividades[i].termino);
+        
+    }
+            //printf("Valor total %f\n", teste);
+    
+
+    }
+
+
+    printf("Projeto: '%s'\n\n", argv[1]);
+    printf("Total de Atividades: %d\n\n", t);
+    printf("Makespan: %.2f\n\n", gVetorAtividades[t-1].termino);
+    printf("Caminho Critico: \n\n");
+
+    for(i = 0; i < t; i++) {
+
+        if(gVetorAtividades[i].critico == 1) {
+
+            printf("%s", gVetorAtividades[i].nome);
+            printf("(%d)\t", gVetorAtividades[i].id);
+            printf("Duração: %.2f\t", gVetorAtividades[i].duracao);
+            printf("[%.2f....%.2f]\n\n", gVetorAtividades[i].inicio, gVetorAtividades[i].termino);
 
         }
         
-    }
-            printf("Valor total %f\n", teste);
-    
 
     }
 
+    printf("Fim do Processamento.\n\n");
+    printf("Verificar os arquivos ‘%s’ e ‘%s’ para"
+    " detalhes sobre a rede de atividades e o Gantt Chart correspondente.\n\n", argv[2], argv[3]);
 
 
+    FILE *arquivoDot = fopen(argv[2], "w");
 
-    /*printf("CAMINHO CRÍTICO \n");
-
-    for (i = 0; i < t; i++) {
-        if (gVetorAtividades[i].critico == 1) {
-            printf("%d, ", gVetorAtividades[i].id);
-        }
-            
-    }*/
-
-    
+    fprintf(arquivoDot, "Digraph Pert\n");
+    fprintf(arquivoDot, "{\n");
+    fprintf(arquivoDot, "rankdir=TB\n");
+    for(i = 0; i < t; i++) {
 
 
-    printf("Termino de F %f\n", gVetorAtividades[t - 1].termino);
+        
+    }
+
 
 
     return (EXIT_SUCCESS);
 }
-
-/*
-void terminoDasAtividades(int *predecessor, int tamanho, int totalAtividades) {
-
-    int i, j;
-
-    for (i = 0; i < tamanho; i++) {
-
-
-
-
-    }
-
-
-}
- */
-
