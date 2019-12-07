@@ -15,6 +15,7 @@
 
                             Ambiente de desenvolvimento: Visual Studio / Linux 
                             Data: 07/12/2019
+                            Objetivo: Construir um algorimo para calular caminho crítico de projetos, alem de gerar arquivos 
 
 */
 
@@ -366,7 +367,7 @@ int main(int argc, char** argv) {
             //Procurar os predecessores do critico atual
             for (i = 0; i < t; i++) {
 
-                
+                // Acha o caminho critico
                 if (R[i][numeroCritico] == 1) {
 
                     if (gVetorAtividades[numeroCritico].inicio == gVetorAtividades[i].termino) {
@@ -384,6 +385,7 @@ int main(int argc, char** argv) {
         } while (tempoInicio != 0);
 
         float teste = 0;
+        
         for (size_t i = 0; i < t; i++) {
 
             if (gVetorAtividades[i].critico == 1) {
