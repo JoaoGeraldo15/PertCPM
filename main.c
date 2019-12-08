@@ -1,9 +1,8 @@
 //                                    Aplicativo PERT SOLVER
 /*
                                         Integrantes do grupo
-                                          
-                                          Nome/Matrícula:
-
+                                           Nome/Matrícula:
+                                        
                                 1- Henrique Ribeiro da Silva 0011453
                                 2- João Geraldo Borges Sales 0049541
                                 3- Rafael Souza Bernardo 0041154
@@ -11,11 +10,12 @@
                                 5- Yuri Gandra Santos 00494666
 */
 
-/*Para compilar o arquivo é necessário atribuir alguns parâmetros na seguinte ordem: ./pert-solver <arquivo>  d.dot futebol.r
+/*Para compilar o arquivo é necessário atribuir alguns parâmetros na seguinte ordem: ./pert-solver <arquivoDeEntrada.txt>  <arquivoDeSaida.dot> arquivoDeSaida.r
 
-                            Ambiente de desenvolvimento: Visual Studio / Linux 
-                            Data: 07/12/2019
-                            Objetivo: Construir um algorimo para calular caminho crítico de projetos, alem de gerar arquivos 
+Ambiente de desenvolvimento: Visual Studio / Linux 
+Data: 07/12/2019
+Objetivo: Construir um algoritmo que pudesse gerenciar projetos mostrando as dependências de cada atividade, o caminho crítico, que é a
+sequência de atividades que mais demanda tempo em um projeto, e por fim, gerar arquivos que representam os resultados obtidos graficamente.
 
 */
 
@@ -24,8 +24,6 @@
 #include <string.h> 
 
 
-//Função para descobrir qual predecessor acaba mais rapido
-//void terminoDasAtividades(int *predecessor, int tamanho, int totalAtividades);
 
 
 /*------------------------------------------------------------*/
@@ -280,17 +278,17 @@ int main(int argc, char** argv) {
                         // Encontra o termino das atividades
                         if (qtdPredecessores == 1) {
 
-                            gVetorAtividades[M[i]].inicio = gVetorAtividades[P[posicao_P]].termino;
+                            gVetorAtividades[M[i]].inicio = gVetorAtividades[P[qtdPredecessores-1]].termino;
                             gVetorAtividades[M[i]].termino = gVetorAtividades[M[i]].inicio + gVetorAtividades[M[i]].duracao;
-                            posicao_P++;
+                            //posicao_P++;
                             //Caso o proximo predecessor tenha o tempo de termino maior que o já atribuido no minimal, será trocado
                         } else if (qtdPredecessores > 1) {
-                            if (gVetorAtividades[M[i]].inicio < gVetorAtividades[P[posicao_P]].termino) {
-                                gVetorAtividades[M[i]].inicio = gVetorAtividades[P[posicao_P]].termino;
+                            if (gVetorAtividades[M[i]].inicio < gVetorAtividades[P[qtdPredecessores-1]].termino) {
+                                gVetorAtividades[M[i]].inicio = gVetorAtividades[P[qtdPredecessores-1]].termino;
                                 //printf("Inicio: %d", gVetorAtividades[M[i]].inicio);                                
                                 gVetorAtividades[M[i]].termino = gVetorAtividades[M[i]].inicio + gVetorAtividades[M[i]].duracao;
                                 //printf("Término: %d", gVetorAtividades[M[i]].termino);
-                                posicao_P++;
+                              //  posicao_P++;
 
                             }
 
@@ -384,17 +382,8 @@ int main(int argc, char** argv) {
 
         } while (tempoInicio != 0);
 
-        float teste = 0;
-        
-        for (size_t i = 0; i < t; i++) {
 
-            if (gVetorAtividades[i].critico == 1) {
-                
-                teste += gVetorAtividades[i].duracao;
-            }
-            
-
-        }
+        // MAKESPAN
 
         printf("Projeto: '%s'\n\n", argv[1]);
         printf("Total de Atividades: %d\n\n", t);
@@ -420,6 +409,8 @@ int main(int argc, char** argv) {
                 " detalhes sobre a rede de atividades e o Gantt Chart correspondente.\n\n", argv[2], argv[3]);
 
 
+
+        // codigo para gerar arquivo .dot
         FILE *arquivoDot = fopen(argv[2], "w");
         char *aux;
 
@@ -453,17 +444,6 @@ int main(int argc, char** argv) {
             for (j = 0; j < t; j++) {
 
 
-                /*if (R[i][j] == 1 ){
-                
-                    if (gVetorAtividades[j].critico == 1) {
-                        fprintf(arquivoDot, "\t%d -> %d [color=\"#ff0000\"];\n",i,j);    
-                    } else {
-                        fprintf(arquivoDot, "\t%d -> %d;\n", i, j);    
-                    }
-                
-                }*/
-
-
                 if (R[i][j] == 1) {
 
                     if (gVetorAtividades[i].critico == 1 && gVetorAtividades[j].critico == 1) {
@@ -488,6 +468,9 @@ int main(int argc, char** argv) {
         fprintf(arquivoDot, "}\n");
 
         char *auxiliar;
+
+
+        // Codigo para gerar arquivo .r
         int fflush(FILE * arquivoDot);
 
         fclose(arquivoDot);
